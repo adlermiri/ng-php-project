@@ -1,3 +1,9 @@
 table, button {
     width: 100%;
 }
+
+.action-link {
+    a {
+        cursor: pointer;
+    }
+}

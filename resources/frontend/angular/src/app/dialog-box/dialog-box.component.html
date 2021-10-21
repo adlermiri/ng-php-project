@@ -1,13 +1,61 @@
 <!-- dialog-box.component.html -->
-<h1 mat-dialog-title>Are you sure about deleting this article?</h1>
+<h1 mat-dialog-title>{{action === 'Add' ? 'Add new article' : action + ' ' + local_data.title}}</h1>
 <div mat-dialog-content>
-    <mat-form-field *ngIf="action != 'Delete'; else elseTemplate">
-        <input placeholder="{{action}} Name" matInput [(ngModel)]="local_data.name">
-    </mat-form-field>
+
+    <ng-container *ngIf="action != 'Delete'; else elseTemplate">
+        <form [formGroup]="form">
+            <div class="mt-5">
+                <mat-form-field class="fullWidth" appearance="outline">
+                    <mat-label>ID</mat-label>
+                    <input matInput type="text" name="id" formControlName="id" />
+                    <mat-error *ngIf="
+                        form.controls['id']?.errors?.required">field required</mat-error>
+                </mat-form-field>
+            </div>
+        
+            <div class="mt-5">
+                <mat-form-field class="fullWidth" appearance="outline">
+                    <mat-label>Title</mat-label>
+                    <input matInput type="text" name="title" formControlName="title" />
+                    <mat-error *ngIf="
+                form.controls['title']?.errors?.required">field required</mat-error>
+                </mat-form-field>
+            </div>
+        
+            <div class="mt-5">
+                <mat-form-field class="fullWidth" appearance="outline">
+                    <mat-label>Content</mat-label>
+                    <input matInput type="text" name="content" formControlName="content" />
+                    <mat-error *ngIf="
+                            form.controls['content']?.errors?.required">field required</mat-error>
+                </mat-form-field>
+            </div>
+        
+            <div class="mt-5" *ngIf="data.updated_at">
+                <mat-form-field class="fullWidth" appearance="outline">
+                    <mat-label>Updated at</mat-label>
+                    <input matInput type="text" name="updated_at" formControlName="updated_at" />
+                    <mat-error *ngIf="
+                                    form.controls['updated_at']?.errors?.required">field required</mat-error>
+                </mat-form-field>
+            </div>
+        
+            <div class="mt-5" *ngIf="data.created_at">
+                <mat-form-field class="fullWidth" appearance="outline">
+                    <mat-label>Created at</mat-label>
+                    <input matInput type="text" name="created_at" formControlName="created_at" />
+                    <mat-error *ngIf="
+                                    form.controls['created_at']?.errors?.required">field required</mat-error>
+                </mat-form-field>
+            </div>
+        </form>
+    </ng-container>
+
     <ng-template #elseTemplate>
-        Sure to delete <b>{{local_data.name}}</b>?
+        Sure to delete article: <b>{{local_data.title}}</b>?
     </ng-template>
 </div>
+
 <div mat-dialog-actions>
     <button mat-button (click)="doAction()">{{action}}</button>
     <button mat-button (click)="closeDialog()" mat-flat-button color="warn">Cancel</button>

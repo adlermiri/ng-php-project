@@ -4,30 +4,24 @@ import { Component, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogBoxComponent } from './dialog-box/dialog-box.component';
+import { Article } from './models/article.interface';
+import { ApiService } from './api/api.service';
 
-export interface UsersData {
-  name: string;
-  id: number;
-}
-
-const ELEMENT_DATA: UsersData[] = [
-  { id: 1560608769632, name: 'Artificial Intelligence' },
-  { id: 1560608796014, name: 'Machine Learning' },
-  { id: 1560608787815, name: 'Robotic Process Automation' },
-  { id: 1560608805101, name: 'Blockchain' }
-];
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  displayedColumns: string[] = ['id', 'name', 'action'];
-  dataSource = ELEMENT_DATA;
+  displayedColumns: string[] = ['id', 'title', 'content', 'updated_at', 'created_at', 'action'];
+  dataSource: Article[] = [];
 
   @ViewChild(MatTable, { static: true }) table: MatTable<any>;
 
-  constructor(public dialog: MatDialog) { }
+  constructor(
+    private apiService: ApiService,
+    public dialog: MatDialog
+  ) { }
 
   openDialog(action, obj) {
     obj.action = action;
@@ -37,36 +31,36 @@ export class AppComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result.event == 'Add') {
-        this.addRowData(result.data);
-      } else if (result.event == 'Update') {
-        this.updateRowData(result.data);
-      } else if (result.event == 'Delete') {
-        this.deleteRowData(result.data);
+      if (result) {
+        if (result.event == 'Add') {
+          this.addArticle(result.data);
+        } else if (result.event == 'Update') {
+          this.updateArticle(result.data);
+        } else if (result.event == 'Delete') {
+          this.deleteArticle(result.data);
+        }
       }
     });
   }
 
-  addRowData(row_obj) {
-    var d = new Date();
-    this.dataSource.push({
-      id: d.getTime(),
-      name: row_obj.name
-    });
+  addArticle(article: Article) {
+    this.apiService.add(article);
+    this.dataSource.push(article);
     this.table.renderRows();
+  }
 
+  updateArticle(article: Article) {
+    let index = this.dataSource.findIndex(a => a.id === article.id);
+    if (index !== -1) {
+      this.apiService.edit(article);
+      this.dataSource[index] = article;
+      this.table.renderRows();
+    }
   }
-  updateRowData(row_obj) {
-    this.dataSource = this.dataSource.filter((value, key) => {
-      if (value.id == row_obj.id) {
-        value.name = row_obj.name;
-      }
-      return true;
-    });
-  }
-  deleteRowData(row_obj) {
-    this.dataSource = this.dataSource.filter((value, key) => {
-      return value.id != row_obj.id;
-    });
+
+  deleteArticle(article: Article) {
+    this.apiService.remove(article.id);
+    this.dataSource = this.dataSource.filter(a => a.id !== article.id);
+    this.table.renderRows();
   }
 }

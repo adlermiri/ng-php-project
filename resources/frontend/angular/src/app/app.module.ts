@@ -5,7 +5,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { DialogBoxComponent } from './dialog-box/dialog-box.component';
+import { ApiService } from './api/api.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,8 @@ import { DialogBoxComponent } from './dialog-box/dialog-box.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
     MatTableModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -30,7 +33,7 @@ import { DialogBoxComponent } from './dialog-box/dialog-box.component';
     MatButtonModule,
     MatInputModule
   ],
-  providers: [],
+  providers: [ApiService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

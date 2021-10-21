@@ -1,12 +1,8 @@
 //dialog-box.component.ts
 import { Component, Inject, Optional } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-
-export interface UsersData {
-  name: string;
-  id: number;
-}
-
+import { Article } from '../models/article.interface';
 
 @Component({
   selector: 'app-dialog-box',
@@ -15,24 +11,38 @@ export interface UsersData {
 })
 export class DialogBoxComponent {
 
+  form: FormGroup;
   action: string;
   local_data: any;
 
   constructor(
     public dialogRef: MatDialogRef<DialogBoxComponent>,
-    //@Optional() is used to prevent error if no data is passed
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: UsersData) {
-    console.log(data);
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: Article) {
+    
     this.local_data = { ...data };
     this.action = this.local_data.action;
+
+    this.form = new FormGroup({
+      "id": new FormControl({ value: data.id ?? '', disabled: !!data.id ? true : false }, Validators.required),
+      "title": new FormControl(data.title ?? '', Validators.required),
+      "content": new FormControl(data.content ?? '', Validators.required),
+      "updated_at": new FormControl({ value: data.updated_at ?? null, disabled: true }, Validators.required),
+      "created_at": new FormControl({ value: data.created_at ?? null, disabled: true }, Validators.required),
+    });
   }
 
   doAction() {
-    this.dialogRef.close({ event: this.action, data: this.local_data });
+    this.dialogRef.close({
+      event: this.action, data: {
+        id: this.form.value.id ?? this.data.id,
+        title: this.form.value.title,
+        content: this.form.value.content,
+        updated_at: new Date().toISOString(),
+        created_at: this.data.created_at ?? new Date().toISOString(),
+    } as Article });
   }
 
   closeDialog() {
     this.dialogRef.close({ event: 'Cancel' });
   }
-
 }
