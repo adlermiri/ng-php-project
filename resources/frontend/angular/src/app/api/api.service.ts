@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, EMPTY, of } from 'rxjs';
-import { catchError, take } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { Article } from '../models/article.interface';
 
 @Injectable({
@@ -10,48 +10,42 @@ import { Article } from '../models/article.interface';
 export class ApiService {
 
     private url = `http://localhost:8000/api/articles`;
-    
-    articles$: BehaviorSubject<Article[]> = new BehaviorSubject([]);
+    articles$: BehaviorSubject<Article[]>;
     articles: Array<Article> = [];
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient
+    ) {
+        this.articles$ = new BehaviorSubject([]);
+    }
 
     get() {
         this.http.get<Article[]>(this.url).pipe(
-            take(1),
-            catchError(error => {
-                return of([]);
-            })
+            first()
         ).subscribe((articles: any) => {
             this.articles = articles.data;
-            this.articles$.next(this.articles);
+            this.articles$.next(articles.data);
         });
     }
 
-    add(Article: Article) {
-        this.http.post<any>(`${this.url}`, Article).pipe(
-            take(1),
-            catchError(error => {
-                return EMPTY;
-            })
+    add(article: Article) {
+        this.http.post<any>(`${this.url}`, article).pipe(
+            first()
         ).subscribe(res => {
-            Article.id = res.data.id;
-            this.articles.push(Article);
+            article.id = res.data.id;
+            this.articles.push(article);
             this.articles$.next(this.articles);
         });
     }
 
-    edit(Article: Article) {
-        let findElem = this.articles.find(p => p.id == Article.id);
-        findElem.title = Article.title;
-        findElem.content = Article.content;
+    edit(article: Article) {
+        let findElem = this.articles.find(p => p.id == article.id);
+        findElem.title = article.title;
+        findElem.content = article.content;
         findElem.updated_at = new Date().toString();
 
-        this.http.put<any>(`${this.url}/${Article.id}`, findElem).pipe(
-            take(1),
-            catchError(error => {
-                return EMPTY;
-            })
+        this.http.put<any>(`${this.url}/${article.id}`, findElem).pipe(
+            first()
         ).subscribe(() => {
             this.articles$.next(this.articles);
         });
@@ -59,15 +53,9 @@ export class ApiService {
 
     remove(id: number) {
         this.http.delete<any>(`${this.url}/${id}`).pipe(
-            take(1),
-            catchError(error => {
-                return EMPTY;
-            })
+            first()
         ).subscribe(() => {
-            this.articles = this.articles.filter(p => {
-                return p.id != id
-            });
-
+            this.articles = this.articles.filter(p => {return p.id != id});
             this.articles$.next(this.articles);
         });
     }

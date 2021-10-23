@@ -1,6 +1,6 @@
 //dialog-box.component.ts
 import { Component, Inject, Optional } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Article } from '../models/article.interface';
 
@@ -23,18 +23,18 @@ export class DialogBoxComponent {
     this.action = this.local_data.action;
 
     this.form = new FormGroup({
-      "id": new FormControl({ value: data.id ?? '', disabled: !!data.id ? true : false }, Validators.required),
-      "title": new FormControl(data.title ?? '', Validators.required),
-      "content": new FormControl(data.content ?? '', Validators.required),
-      "updated_at": new FormControl({ value: data.updated_at ?? null, disabled: true }, Validators.required),
-      "created_at": new FormControl({ value: data.created_at ?? null, disabled: true }, Validators.required),
+      "id": new FormControl({ value: data.id ?? '', disabled: !!data.id ? true : false }),
+      "title": new FormControl(data.title ?? ''),
+      "content": new FormControl(data.content ?? ''),
+      "updated_at": new FormControl({ value: data.updated_at ?? null, disabled: true }),
+      "created_at": new FormControl({ value: data.created_at ?? null, disabled: true }),
     });
   }
 
   doAction() {
     this.dialogRef.close({
       event: this.action, data: {
-        id: this.form.value.id ?? this.data.id,
+        id: this.data.id,
         title: this.form.value.title,
         content: this.form.value.content,
         updated_at: new Date().toISOString(),
